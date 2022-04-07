@@ -1,6 +1,8 @@
 # flappy-bird-console
 A console flappy bird game
 
+Download the latest release from https://github.com/AlexanderJCS/flappy-bird-console/releases
+
 <b>Please note: there will be some unavoidable flickering. This is just the nature of the console; it takes time to print characters.</b>
 
 <h2>How to play:</h2> 
