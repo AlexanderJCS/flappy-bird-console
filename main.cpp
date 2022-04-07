@@ -4,6 +4,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 #define RED "\u001b[31m"
 #define GREEN "\u001b[32m"
@@ -212,16 +213,16 @@ public:
                 draw();
                 std::cout << GREEN << "\nScore: " << score << RESETCOLOR << "\n";
 
-                // Check if the bird collides with a pipe or floor
+                // Check if the bird collides with a pipe or floor 
                 if (collisionCheck())
-                    goto endGame;
-
+                    return;
+                
                 if (jumped())  // Check if the the player pressed the spacebar
                     bird.jump(determineJumpHeight());  // Jump the bird
 
                 else
                     bird.fall();
-                
+
                 // Move the pipes back and update score
                 for (Pipe &pipe : pipes) 
                 {
@@ -232,7 +233,7 @@ public:
                 }
 
                 // Check if a pipe is out of the screen
-                for (int i = pipes.size(); i >= 0; i--)
+                for (int i = pipes.size() - 1; i >= 0; i--)
                 {
                     if (pipes[i].x < 0)
                         pipes.erase(pipes.begin() + i);
@@ -241,9 +242,6 @@ public:
                 Sleep(REFRESH); 
             }
         }
-
-        endGame:
-            return;
     }
 };
 
