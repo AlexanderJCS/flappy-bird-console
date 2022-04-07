@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <string>
+#include <cmath>
 #include <vector>
 
 #define RED "\u001b[31m"
@@ -11,7 +12,8 @@
 
 const int WIDTH = 50;
 const int HEIGHT = 25;
-const int REFRESH = 100;
+const int REFRESH = 75;
+const double GRAVITY = 0.15;
 
 const int JUMP_HEIGHT = HEIGHT / 4 - 1;
 
@@ -28,13 +30,14 @@ bool playAgain()
         return false;
 }
 
-class Bird {
-public:
+struct Bird {
     int x = 4;
-    int y = HEIGHT / 2;
+    double y = HEIGHT / 2;
+    double vely = 0;
 
     void jump(bool smallJump) 
     {
+        vely = 0;
         if (smallJump)
             y -= 3;
         
@@ -44,13 +47,13 @@ public:
 
     void fall()
     {
-        y++;
+        vely += GRAVITY;
+        y += vely;
     }
 };
 
-class Pipe 
+struct Pipe 
 {
-public:
     int x = WIDTH;
     int bottom = rand() % (HEIGHT - 7 + 1);
     int top = bottom + 5 + rand() % 2;
@@ -78,7 +81,7 @@ private:
         for (int i = 0; i <= WIDTH; i++)
             screen[0] += "- ";
 
-        screen[0] += "- +\n";
+        screen[0] += "+\n";
 
         // Print the main area
         for (int y = 0; y < HEIGHT - 1; y++)
@@ -88,7 +91,7 @@ private:
 
             for (int x = 0; x <= WIDTH; x++)
             {
-                if (y == bird.y && x == bird.x)
+                if (y == std::round(bird.y) && x == bird.x)
                     screen[y + 1] += "O";
 
                 else
@@ -156,7 +159,7 @@ private:
             if (pipe.x != bird.x)
                 continue;
             
-            if (pipe.top <= bird.y || pipe.bottom >= bird.y)
+            if (pipe.top <= std::round(bird.y) || pipe.bottom >= std::round(bird.y))
                 return true;
         }
         return false;
@@ -175,7 +178,7 @@ private:
             {
                 int diff = pipe.x - bird.x;
 
-                if (0 <= diff && diff <= 2)
+                if (0 <= diff && diff <= 3)
                     return true;
             }
         }
@@ -249,7 +252,7 @@ int main()
     while (true)
     {
         Game game;
-        game.run();
+        game.run();  // Run the game
 
         if (!playAgain())
             break;
