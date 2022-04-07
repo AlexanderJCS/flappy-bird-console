@@ -16,7 +16,7 @@ const int HEIGHT = 25;
 const int REFRESH = 75;
 const double GRAVITY = 0.15;
 
-const int JUMP_HEIGHT = HEIGHT / 4 - 1;
+const int JUMP_SPEED = 2.2;
 
 bool playAgain()
 {
@@ -38,18 +38,17 @@ struct Bird {
 
     void jump(bool smallJump) 
     {
-        vely = 0;
         if (smallJump)
-            y -= 3;
+            vely += JUMP_SPEED - 0.5;
         
         else
-            y -= JUMP_HEIGHT;
+            vely += JUMP_SPEED;
     }
 
     void fall()
     {
-        vely += GRAVITY;
-        y += vely;
+        vely -= GRAVITY;
+        y -= vely;
     }
 };
 
@@ -73,6 +72,10 @@ private:
 
     void draw()
     {
+        /*
+        Draws the board by rendering the next frame in a nested vector before displaying
+        This significantly reduces flickering
+        */
         std::vector<std::string> screen;  // Create board to be printed
 
         screen.push_back(std::string(""));  // Add empty line
@@ -152,7 +155,7 @@ private:
 
     bool collisionCheck()  // Check if the bird collides with a pipe or floor
     {
-        if (bird.y < 0 || bird.y > HEIGHT)
+        if (round(bird.y) < 0 || round(bird.y) > HEIGHT)
             return true;
 
         for (Pipe pipe : pipes)
@@ -170,18 +173,12 @@ private:
     {
         bool smallJump = false;
 
-        if (bird.y < JUMP_HEIGHT)  // If the bird should do a small jump
-            return true;
-
-        else  // If the bird is near a pipe, do a small jump
+        for (Pipe pipe : pipes)  // If the bird is 3 characters away from the pipe, do a small jump
         {
-            for (Pipe pipe : pipes)
-            {
-                int diff = pipe.x - bird.x;
+            int diff = pipe.x - bird.x;
 
-                if (0 <= diff && diff <= 3)
-                    return true;
-            }
+            if (0 <= diff && diff <= 3)
+                return true;
         }
         return false;
     }
@@ -220,8 +217,7 @@ public:
                 if (jumped())  // Check if the the player pressed the spacebar
                     bird.jump(determineJumpHeight());  // Jump the bird
 
-                else
-                    bird.fall();
+                bird.fall();
 
                 // Move the pipes back and update score
                 for (Pipe &pipe : pipes) 
